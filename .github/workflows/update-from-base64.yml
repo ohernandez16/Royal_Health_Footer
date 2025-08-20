@@ -6,29 +6,27 @@ on:
       filename:
         description: 'The name of the file to update (e.g. banner.jpg)'
         required: true
-      base64_content:
+        type: string
+      base64:
         description: 'The Base64-encoded content of the file'
         required: true
+        type: string
 
 jobs:
   update-file:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout the repository
+        uses: actions/checkout@v4
 
-      - name: Decode Base64 content and overwrite file
+      - name: Decode base64 and overwrite file
         run: |
-          echo "${{ github.event.inputs.base64_content }}" | base64 -d > "${{ github.event.inputs.filename }}"
-
-      - name: Set up Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          echo "${{ github.event.inputs.base64 }}" | base64 -d > "${{ github.event.inputs.filename }}"
 
       - name: Commit and push changes
         run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
           git add "${{ github.event.inputs.filename }}"
-          git commit -m "Automated file update: ${{ github.event.inputs.filename }}"
+          git commit -m "Update ${{ github.event.inputs.filename }} via GitHub Actions"
           git push
